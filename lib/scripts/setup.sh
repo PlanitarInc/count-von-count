@@ -1,6 +1,6 @@
 #!/bin/bash
 DEPLOY_TO="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
-NGINX_DIR="/usr/local/openresty/nginx"
+NGINX_DIR="/opt/openresty/nginx"
 USER=$(whoami)
 
 chown -R $USER:$USER $NGINX_DIR

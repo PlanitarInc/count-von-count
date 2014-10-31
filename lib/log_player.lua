@@ -1,11 +1,11 @@
-package.cpath = "/usr/local/openresty/lualib/?.so;" .. package.cpath
-package.path = "/usr/local/openresty/nginx/Count-von-Count/lib/nginx/request_metadata_parameters_plugins/?.lua;" .. package.path
+package.cpath = "/opt/openresty/lualib/?.so;" .. package.cpath
+package.path = "/opt/openresty/nginx/Count-von-Count/lib/nginx/request_metadata_parameters_plugins/?.lua;" .. package.path
 local logFilePath = arg[1]
 
 local cjson = require "cjson"
 
 function setConfig()
-  config_file = "/usr/local/openresty/nginx/Count-von-Count/config/voncount.config"
+  config_file = "/opt/openresty/nginx/Count-von-Count/config/voncount.config"
   f = io.popen("cat " .. config_file .. " | tr -d '\n' | tr -d ' '")
   content = f:read('*a')
   conf = cjson.encode(content)
@@ -17,7 +17,7 @@ function redisCli()
 end
 
 function getRedisCountingHash()
-  vars_conf_path = "/usr/local/openresty/nginx/conf/vars.conf"
+  vars_conf_path = "/opt/openresty/nginx/conf/vars.conf"
   for line in io.lines(vars_conf_path) do
     if line:match("$redis_counter_hash") then
       for i in (line:gmatch("%S+")) do
@@ -73,7 +73,7 @@ function playLine(line)
 end
 
 function loadSystemConfig()
-  config_path = "/usr/local/openresty/nginx/Count-von-Count/config/system.config"
+  config_path = "/opt/openresty/nginx/Count-von-Count/config/system.config"
   SYSTEM_CONFIG = {}
   for line in io.lines(config_path) do
     for i,j in line:gmatch("(%S+):%s*(%S+)") do

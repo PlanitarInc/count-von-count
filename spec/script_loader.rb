@@ -8,7 +8,7 @@ class ScriptLoader
   def self.load
     set_config
     load_scripts_to_log_player_test_db if self.spec_config["log_player_integration"]
-    File.open("/usr/local/openresty/nginx/conf/vars.conf", 'w') { |f| f.write(<<-VARS
+    File.open("/opt/openresty/nginx/conf/vars.conf", 'w') { |f| f.write(<<-VARS
       set $redis_counter_hash #{von_count_script_hash};
       VARS
       ) }
@@ -36,7 +36,7 @@ class ScriptLoader
   end
 
   def self.clean_access_log
-    `rm -f /usr/local/openresty/nginx/logs/access.log`
+    `rm -f /opt/openresty/nginx/logs/access.log`
   end
 
   def self.personal_settings

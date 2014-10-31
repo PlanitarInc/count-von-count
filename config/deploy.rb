@@ -7,7 +7,7 @@ set :scm, :git
 set :deploy_to, '/home/deploy/count-von-count'
 set :user, "deploy"
 set :use_sudo, false
-set :nginx_dir, "/usr/local/openresty/nginx"
+set :nginx_dir, "/opt/openresty/nginx"
 set :branch, fetch(:branch, "master")
 set :env, fetch(:env, "production")
 
