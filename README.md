@@ -573,13 +573,15 @@ Each `post` is written by a `user` who is the author, and the post "belongs" to 
    
 ## DateTime Plugin
 
-| Parameter Name | Description                                                          |
-|----------------|----------------------------------------------------------------------|
-| *day*          | current day of the month                                             |
-| *yday*         | day index of the year (out of 365)                                   |
-| *week*         | week index of the year (out of 52). Weeks start and end on Mondays.   |
-| *month*        | month index of the year (out of 12)                                  |
-| *year*         | in 4-digit format                                                   |
+| Parameter Name | Description                                                     |
+|----------------|-----------------------------------------------------------------|
+| *day*          | current day of the month (01-31)                                |
+| *yday*         | day index of the year (001-366)                                 |
+| *wday*         | day index of the week (0-6, starting from Sundays)              |
+| *week*         | week index of the year (00-51). Weeks start and end on Sundays. |
+| *month*        | month index of the year (01-12)                                 |
+| *year*         | in 4-digit format                                               |
+| *time*         | 24-hour HH:MM time                                              |
 
 ### Customization
   

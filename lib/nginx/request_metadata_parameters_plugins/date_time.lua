@@ -16,13 +16,15 @@ function date_time:AddToArgsFromLogPlayer(args, line)
 end
 
 function date_time:fromString(args, str)
-  args["day"] = os.date("%d", str)
-  args["yday"] = os.date("%j", str)
-  args["week"] = os.date("%W", str)
-  args["month"] = os.date("%m", str)
-  args["year"] = os.date("%Y", str)
-  args["week_year"] = args["week"] .. "_" .. args["year"]
+  args["day"] = os.date("!%d", str)
+  args["yday"] = os.date("!%j", str)
+  args["wday"] = os.date("!%w", str)
+  args["week"] = os.date("!%U", str)
+  args["month"] = os.date("!%m", str)
+  args["year"] = os.date("!%Y", str)
+  args["time"] = os.date("!%H:%M", str)
 
+  args["week_year"] = args["week"] .. "_" .. args["year"]
   if args["week"] == "00" then
     local last_year = tostring( tonumber(args["year"]) - 1 )
     args["week_year"] = "52_" .. last_year
