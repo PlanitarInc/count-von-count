@@ -46,12 +46,9 @@ end
 
 local Base = {}
 
-function Base:new(_obj_type, ids, _type)
-  local redis_key = _obj_type
-  for k, id in ipairs(ids) do
-    redis_key = redis_key .. "_" .. id
-  end
-  local baseObj = { redis_key = redis_key, _type = _type, _ids = ids,  _obj_type = _obj_type }
+function Base:new(_obj_type, id, _type)
+  local redis_key = _obj_type .. id
+  local baseObj = { redis_key = redis_key, _type = _type, _obj_type = _obj_type }
   self.__index = self
   return setmetatable(baseObj, self)
 end
@@ -87,20 +84,21 @@ function Base:countIfExist(value, should_count,  key)
   end
 end
 
-function Base:sevenDaysCount(should_count, key)
-  if should_count ~= "0" and should_count ~= "false" then
-    local first_day = tonumber(self._ids[3])
-    for day = 0, 6, 1 do
-      local curDayObjIds = dupArray(self._ids)
-      if (first_day + day) > 365 then
-        curDayObjIds[4] = string.format("%03d", (tonumber(curDayObjIds[4]) + 1) )
-      end
-      local curDayObj = Base:new(self._obj_type, curDayObjIds, self._type)
-      curDayObj:count(key, 1)
-      curDayObj:expire(1209600)  -- expire in 2 weeks
-    end
-  end
-end
+-- XXX Looks like a hack, for now I'll just comment it out.
+-- function Base:sevenDaysCount(should_count, key)
+--     if should_count ~= "0" and should_count ~= "false" then
+--     local first_day = tonumber(self._ids[3])
+--     for day = 0, 6, 1 do
+--       local curDayObjIds = dupArray(self._ids)
+--       if (first_day + day) > 365 then
+--         curDayObjIds[4] = string.format("%03d", (tonumber(curDayObjIds[4]) + 1) )
+--       end
+--       local curDayObj = Base:new(self._obj_type, curDayObjIds, self._type)
+--       curDayObj:count(key, 1)
+--       curDayObj:expire(1209600)  -- expire in 2 weeks
+--     end
+--   end
+-- end
 
 function Base:countAndSetIf(should_count, countKey, redisKey, setKey)
   if should_count ~= "0" and should_count ~= "false" then
@@ -135,7 +133,7 @@ local function addValuesToKey(tbl, key)
   local match = key:match("{[%w_]*}")
 
   while match do
-    local subStrings = flattenArray({ tbl[match:sub(2, -2)] })
+    local subStrings = flattenArray({ tbl[match:sub(2, -2)] or "" })
     local tempResult = {}
     for i, subStr in ipairs(subStrings) do
       local dup = dupArray(rslt)
@@ -176,10 +174,10 @@ if action_config then
     for i, defs in ipairs(methods) do
       setmetatable(defs, { __index = defaultMethod })
 
-      local ids = getValueByKeys(params, defs["id"])
+      local id = addValuesToKey(params, defs["id"])
       local _type = defs["type"] or "hash"
 
-      local obj = Base:new(obj_type, ids, _type)
+      local obj = Base:new(obj_type, id, _type)
 
       if defs["count"] then
         local key = addValuesToKey(params, defs["count"])
