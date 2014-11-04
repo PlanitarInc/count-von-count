@@ -171,13 +171,15 @@ local action_config = config[action]
 
 if action_config then
   for obj_type, methods in pairs(action_config) do
+    local obj_prefix = addValuesToKey(params, obj_type)
+
     for i, defs in ipairs(methods) do
       setmetatable(defs, { __index = defaultMethod })
 
       local id = addValuesToKey(params, defs["id"])
       local _type = defs["type"] or "hash"
 
-      local obj = Base:new(obj_type, id, _type)
+      local obj = Base:new(obj_prefix, id, _type)
 
       if defs["count"] then
         local key = addValuesToKey(params, defs["count"])
