@@ -1,6 +1,5 @@
 require 'yaml'
 require 'json'
-require 'ruby-debug'
 class ScriptLoader
   class << self
     attr_accessor :log_player_reads_hash
