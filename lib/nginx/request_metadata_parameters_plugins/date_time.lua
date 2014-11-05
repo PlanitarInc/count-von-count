@@ -16,13 +16,15 @@ function date_time:AddToArgsFromLogPlayer(args, line)
 end
 
 function date_time:fromString(args, str)
+  local t = os.date("*t")
+
   args["day"] = os.date("!%d", str)
   args["yday"] = os.date("!%j", str)
   args["wday"] = os.date("!%w", str)
   args["week"] = os.date("!%U", str)
   args["month"] = os.date("!%m", str)
   args["year"] = os.date("!%Y", str)
-  args["time"] = os.date("!%H:%M", str)
+  args["time_30m"] = os.date("!%H", str) .. (t["min"] < 30 and ":00" or ":30")
 
   args["week_year"] = args["week"] .. "_" .. args["year"]
   if args["week"] == "00" then
