@@ -40,6 +40,14 @@ local function dupArray(arr)
   return dup
 end
 
+local function simplifyArray(arr)
+  if #arr == 1 then
+    return arr[1]
+  else
+    return arr
+  end
+end
+
 -----------------------------------------------------
 
 -------------- Base Class  ---------------------------------------------------------
@@ -56,13 +64,17 @@ end
 
 function Base:count(key, num)
   local allKeys = flattenArray({ key })
+  local res = {}
   for i, curKey in ipairs(allKeys) do
+    local count
     if self._type == "set" then
-      redis.call("ZINCRBY", self.redis_key, num, curKey)
+      count = redis.call("ZINCRBY", self.redis_key, num, curKey)
     else
-      redis.call("HINCRBY", self.redis_key, curKey, num)
+      count = redis.call("HINCRBY", self.redis_key, curKey, num)
     end
+    res[#res + 1] = count
   end
+  return simplifyArray(res)
 end
 
 function Base:expire(ttl)
@@ -74,13 +86,13 @@ end
 
 function Base:conditionalCount(should_count, key)
   if should_count ~= "0" and should_count ~= "false" then
-    self:count(key, 1)
+    return self:count(key, 1)
   end
 end
 
 function Base:countIfExist(value, should_count,  key)
   if value and value ~= "" and value ~= "null" and value ~= "nil" then
-    self:conditionalCount(should_count, key)
+    return self:conditionalCount(should_count, key)
   end
 end
 
@@ -104,7 +116,7 @@ function Base:countAndSetIf(should_count, countKey, redisKey, setKey)
   if should_count ~= "0" and should_count ~= "false" then
     self:count(countKey, 1)
     local setCount = redis.call("ZCOUNT", self.redis_key, "-inf", "+inf")
-    redis.call("HSET", redisKey, setKey, setCount)
+    return redis.call("HSET", redisKey, setKey, setCount)
   end
 end
 ----------------------------------------------------------
@@ -151,11 +163,7 @@ local function addValuesToKey(tbl, key)
     end
   end
 
-  if #rslt == 1 then
-    return rslt[1]
-  else
-    return rslt
-  end
+  return simplifyArray(rslt)
 end
 
 
