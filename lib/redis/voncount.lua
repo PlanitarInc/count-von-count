@@ -77,6 +77,14 @@ function Base:count(key, num)
   return simplifyArray(res)
 end
 
+function Base:getCount(key)
+  if self._type == "set" then
+    return redis.call("ZINCRBY", self.redis_key, 0, key)
+  else
+    return redis.call("HINCRBY", self.redis_key, key, 0)
+  end
+end  
+
 function Base:expire(ttl)
   if redis.call("TTL", self.redis_key) == -1 then
     redis.call("EXPIRE", self.redis_key, ttl)
@@ -118,6 +126,15 @@ function Base:countAndSetIf(should_count, countKey, redisKey, setKey)
     local setCount = redis.call("ZCOUNT", self.redis_key, "-inf", "+inf")
     return redis.call("HSET", redisKey, setKey, setCount)
   end
+end
+
+function Base:mean(keySuffix, countKey)
+  local count = self:getCount(countKey)
+  local obj = Base:new(self._obj_type, keySuffix, "hash")
+  local sum = obj:count(countKey .. ".sum", 1)
+  -- increment the number in the first time only (i.e. count == 1)
+  local n = obj:count(countKey .. ".n", count == 1 and 1 or 0)
+  return redis.call("HSET", obj.redis_key, countKey, sum / n)
 end
 ----------------------------------------------------------
 
