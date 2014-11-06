@@ -16,7 +16,7 @@ function date_time:AddToArgsFromLogPlayer(args, line)
 end
 
 function date_time:fromString(args, str)
-  local t = os.date("*t")
+  local t = os.date("!*t", str)
 
   args["day"] = os.date("!%d", str)
   args["yday"] = os.date("!%j", str)
