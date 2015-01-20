@@ -54,13 +54,21 @@ end
 
 local Base = {}
 
-function Base:new(_obj_type, id, _type)
-  local redis_key = _obj_type .. id
+function Base:new(_obj_type, _id, _type)
+  local redis_key = _obj_type .. ":" .. _id
   local baseObj = { redis_key = redis_key, _type = _type, _obj_type = _obj_type }
   self.__index = self
   return setmetatable(baseObj, self)
 end
 
+function Base:set(key, num)
+  if self._type == "set" then
+    redis.call("ZADD", self.redis_key, num, key)
+  else
+    redis.call("HSET", self.redis_key, key, num)
+  end
+  return num
+end
 
 function Base:count(key, num)
   local allKeys = flattenArray({ key })
@@ -72,14 +80,14 @@ function Base:count(key, num)
     else
       count = redis.call("HINCRBY", self.redis_key, curKey, num)
     end
-    res[#res + 1] = count
+    res[#res + 1] = tonumber(count)
   end
   return simplifyArray(res)
 end
 
 function Base:getCount(key)
   if self._type == "set" then
-    return redis.call("ZINCRBY", self.redis_key, 0, key)
+    return tonumber(redis.call("ZINCRBY", self.redis_key, 0, key))
   else
     return redis.call("HINCRBY", self.redis_key, key, 0)
   end
@@ -128,14 +136,31 @@ function Base:countAndSetIf(should_count, countKey, redisKey, setKey)
   end
 end
 
-function Base:mean(keySuffix, countKey)
+function Base:mean(suffix)
+  local countKey = self.countKey or ""
   local count = self:getCount(countKey)
-  local obj = Base:new(self._obj_type, keySuffix, "hash")
-  local sum = obj:count(countKey .. ".sum", 1)
-  -- increment the number in the first time only (i.e. count == 1)
-  local n = obj:count(countKey .. ".n", count == 1 and 1 or 0)
-  return redis.call("HSET", obj.redis_key, countKey, sum / n)
+  local allSuffixes = flattenArray({ suffix })
+  local res = {}
+  for i, currSuffix in ipairs(allSuffixes) do
+    local obj = Base:new(self._obj_type, currSuffix, self._type)
+    local obj_aux = Base:new(obj.redis_key, "_aux_", self._type)
+    local sum = obj_aux:count(countKey .. ".sum", 1)
+    -- increment the number in the first time only (i.e. count == 1)
+    local n = obj_aux:count(countKey .. ".n", count == 1 and 1 or 0)
+    res[#res + 1] = obj:set(countKey, sum / n)
+  end
+  return simplifyArray(res)
 end
+
+function Base:loopMean(starttime, steptime, count, format)
+  local endtime = starttime + steptime * (count - 1)
+  local suffixes = {}
+  for currtime = starttime, endtime, steptime do
+    suffixes[#suffixes + 1] = os.date(format, currtime)
+  end
+  return self:mean(suffixes)
+end
+
 ----------------------------------------------------------
 
 
@@ -209,6 +234,7 @@ if action_config then
       if defs["count"] then
         local key = addValuesToKey(params, defs["count"])
         local change = defs["change"]
+        obj.countKey = key
         obj:count(key, change)
       end
 
