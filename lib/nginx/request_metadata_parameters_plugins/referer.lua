@@ -9,6 +9,7 @@ function referer:AddtoArgsFromNginx(args)
 end
 
 function referer:AddToArgsFromLogPlayer(args, line)
+  -- XXX
   referer:fromString(args)
 end
 

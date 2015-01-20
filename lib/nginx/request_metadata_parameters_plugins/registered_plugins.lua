@@ -1,7 +1,8 @@
 local registered_plugins =
 {
   "date_time",
-  "referer"
+  "referer",
+  "unique"
  --"country"
 }
 return registered_plugins
