@@ -573,15 +573,30 @@ Each `post` is written by a `user` who is the author, and the post "belongs" to 
    
 ## DateTime Plugin
 
-| Parameter Name | Description                                                          |
-|----------------|----------------------------------------------------------------------|
-| *day*          | current day of the month (01-31)                                     |
-| *yday*         | day index of the year (001-366)                                      |
-| *wday*         | day index of the week (0-6, starting from Sundays)                   |
-| *week*         | week index of the year (00-51). Weeks start and end on Sundays.      |
-| *month*        | month index of the year (01-12)                                      |
-| *year*         | in 4-digit format                                                    |
-| *time_30m*     | 24-hour HH:MM time, rounded to 30m (00:00, 00:30, 01:00, ..., 23:30) |
+| Parameter Name | Description                                                     |
+|----------------|-----------------------------------------------------------------|
+| *day_sec*      | #seconds in a day (24 * 60 * 60)                                |
+| *week_sec*     | #seconds in a week (7 * 24 * 60 * 60)                           |
+| *month_sec*    | #seconds in a month (30 days) (30 * 24 * 60 * 60)               |
+|                |                                                                 |
+| *epoch*        | current epoch seconds (#seconds since 1970-01-01) (00-23)       |
+| *hour*         | current hour (00-23)                                            |
+| *day*          | current day of the month (01-31)                                |
+| *yday*         | day index of the year (001-366)                                 |
+| *wday*         | day index of the week (0-6, starting from Sundays)              |
+| *week*         | week index of the year (00-51). Weeks start and end on Sundays. |
+| *month*        | month index of the year (01-12)                                 |
+| *year*         | in 4-digit format                                               |
+
+## Unique Plugin
+
+Iff query args contains `repeated` parameter, `unique` is set.
+
+## Referer Plugin
+
+Sets two arguments based on `Referer` HTTP header:
+ - `referer_host`
+ - `referer` (the full referer)
 
 ### Customization
   

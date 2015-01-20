@@ -1,3 +1,5 @@
+local utils = require "utils"
+
 local date_time = {}
 local MON={Jan=1,Feb=2,Mar=3,Apr=4,May=5,Jun=6,Jul=7,Aug=8,Sep=9,Oct=10,Nov=11,Dec=12}
 
@@ -16,15 +18,19 @@ function date_time:AddToArgsFromLogPlayer(args, line)
 end
 
 function date_time:fromString(args, str)
-  local t = os.date("!*t", str)
+  args["day_sec"] = utils:duration("day_sec")
+  args["week_sec"] = utils:duration("week_sec")
+  args["month_sec"] = utils:duration("month_sec")
 
+  args["epoch"] = utils:utctime(os.date("*t", str))
+
+  args["hour"] = os.date("!%H", str)
   args["day"] = os.date("!%d", str)
   args["yday"] = os.date("!%j", str)
   args["wday"] = os.date("!%w", str)
   args["week"] = os.date("!%U", str)
   args["month"] = os.date("!%m", str)
   args["year"] = os.date("!%Y", str)
-  args["time_30m"] = os.date("!%H", str) .. (t["min"] < 30 and ":00" or ":30")
 
   args["week_year"] = args["week"] .. "_" .. args["year"]
   if args["week"] == "00" then

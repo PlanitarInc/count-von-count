@@ -44,4 +44,19 @@ function utils:emptyGif()
   ngx.exec('/_.gif')
 end
 
+function utils:utctime(t)
+  return os.time(t) - os.time({year=1970, month=1, day=1, hour=0})
+end
+
+local durations = {
+  ["min_sec"]   =                60,
+  ["hour_sec"]  =           60 * 60,
+  ["day_sec"]   =      24 * 60 * 60,
+  ["week_sec"]  =  7 * 24 * 60 * 60,
+  ["month_sec"] = 30 * 24 * 60 * 60, -- XXX good enough
+}
+function utils:duration(d)
+  return durations[d]
+end
+
 return utils
